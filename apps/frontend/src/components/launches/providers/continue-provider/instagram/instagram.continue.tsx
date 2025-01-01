@@ -26,8 +26,10 @@ export const InstagramContinue: FC<{
     } catch (error) {
       closeModal();
       console.error('Error loading Instagram pages:', error);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
       alert(
-        `Failed to load Instagram pages. Error: ${error.message}. Please try again or contact support if the issue persists.`
+        `Failed to load Instagram pages. Error: ${errorMessage}. Please try again or contact support if the issue persists.`
       );
     }
   }, []);
@@ -58,8 +60,10 @@ export const InstagramContinue: FC<{
       closeModal();
     } catch (error) {
       console.error('Error saving Instagram integration:', error);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
       alert(
-        `Failed to save Instagram integration. Error: ${error.message}. Please try again or contact support if the issue persists.`
+        `Failed to save Instagram integration. Error: ${errorMessage}. Please try again or contact support if the issue persists.`
       );
     }
   }, [integration, page]);
