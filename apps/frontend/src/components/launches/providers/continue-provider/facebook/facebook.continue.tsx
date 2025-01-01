@@ -23,7 +23,9 @@ export const FacebookContinue: FC<{
     } catch (e) {
       closeModal();
       console.error('Error loading Facebook pages:', e);
-      alert('Failed to load Facebook pages. Please try again or contact support if the issue persists.');
+      alert(
+        `Failed to load Facebook pages. Error: ${e.message}. Please try again or contact support if the issue persists.`
+      );
     }
   }, []);
 
@@ -53,7 +55,9 @@ export const FacebookContinue: FC<{
       closeModal();
     } catch (error) {
       console.error('Error saving Facebook integration:', error);
-      alert('Failed to save Facebook integration. Please try again or contact support if the issue persists.');
+      alert(
+        `Failed to save Facebook integration. Error: ${error.message}. Please try again or contact support if the issue persists.`
+      );
     }
   }, [integration, page]);
 

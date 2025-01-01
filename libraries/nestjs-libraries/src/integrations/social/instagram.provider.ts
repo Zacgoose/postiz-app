@@ -67,7 +67,9 @@ export class InstagramProvider
       };
     } catch (error) {
       Logger.error('Error during Instagram reconnection:', error);
-      throw new Error('Failed to reconnect with Instagram. Please try again or contact support if the issue persists.');
+      throw new Error(
+        `Failed to reconnect with Instagram. Error: ${error.message}. Please try again or contact support if the issue persists.`
+      );
     }
   }
 
@@ -90,55 +92,51 @@ export class InstagramProvider
   async authenticate(params: {
     code: string;
     codeVerifier: string;
-    refresh: string;
+    refresh?: string;
   }) {
     try {
-      const getAccessToken = await (
-        await this.fetch(
-          'https://graph.facebook.com/v20.0/oauth/access_token' +
-            `?client_id=${process.env.FACEBOOK_APP_ID}` +
-            `&redirect_uri=${encodeURIComponent(
-              `${process.env.FRONTEND_URL}/integrations/social/instagram${
-                params.refresh ? `?refresh=${params.refresh}` : ''
-              }`
-            )}` +
-            `&client_secret=${process.env.FACEBOOK_APP_SECRET}` +
-            `&code=${params.code}`
-        )
-      ).json();
+      const getAccessTokenResponse = await this.fetch(
+        'https://graph.facebook.com/v20.0/oauth/access_token' +
+          `?client_id=${process.env.FACEBOOK_APP_ID}` +
+          `&redirect_uri=${encodeURIComponent(
+            `${process.env.FRONTEND_URL}/integrations/social/instagram${
+              params.refresh ? `?refresh=${params.refresh}` : ''
+            }`
+          )}` +
+          `&client_secret=${process.env.FACEBOOK_APP_SECRET}` +
+          `&code=${params.code}`
+      );
+      const getAccessToken = await getAccessTokenResponse.json();
 
-      const { access_token, expires_in, ...all } = await (
-        await this.fetch(
-          'https://graph.facebook.com/v20.0/oauth/access_token' +
-            '?grant_type=fb_exchange_token' +
-            `&client_id=${process.env.FACEBOOK_APP_ID}` +
-            `&client_secret=${process.env.FACEBOOK_APP_SECRET}` +
-            `&fb_exchange_token=${getAccessToken.access_token}`
-        )
-      ).json();
+      const exchangeTokenResponse = await this.fetch(
+        'https://graph.facebook.com/v20.0/oauth/access_token' +
+          '?grant_type=fb_exchange_token' +
+          `&client_id=${process.env.FACEBOOK_APP_ID}` +
+          `&client_secret=${process.env.FACEBOOK_APP_SECRET}` +
+          `&fb_exchange_token=${getAccessToken.access_token}&fields=access_token,expires_in`
+      );
+      const { access_token } = await exchangeTokenResponse.json();
 
-      const { data } = await (
-        await this.fetch(
-          `https://graph.facebook.com/v20.0/me/permissions?access_token=${access_token}`
-        )
-      ).json();
+      const permissionsResponse = await this.fetch(
+        `https://graph.facebook.com/v20.0/me/permissions?access_token=${access_token}`
+      );
+      const { data } = await permissionsResponse.json();
 
       const permissions = data
         .filter((d: any) => d.status === 'granted')
         .map((p: any) => p.permission);
       this.checkScopes(this.scopes, permissions);
 
+      const userInfoResponse = await this.fetch(
+        `https://graph.facebook.com/v20.0/me?fields=id,name,picture&access_token=${access_token}`
+      );
       const {
         id,
         name,
         picture: {
           data: { url },
         },
-      } = await (
-        await this.fetch(
-          `https://graph.facebook.com/v20.0/me?fields=id,name,picture&access_token=${access_token}`
-        )
-      ).json();
+      } = await userInfoResponse.json();
 
       return {
         id,
@@ -151,7 +149,9 @@ export class InstagramProvider
       };
     } catch (error) {
       Logger.error('Error during Instagram authentication:', error);
-      throw new Error('Failed to authenticate with Instagram. Please try again or contact support if the issue persists.');
+      throw new Error(
+        `Failed to authenticate with Instagram. Error: ${error.message}. Please try again or contact support if the issue persists.`
+      );
     }
   }
 

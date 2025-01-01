@@ -26,7 +26,9 @@ export const InstagramContinue: FC<{
     } catch (e) {
       closeModal();
       console.error('Error loading Instagram pages:', e);
-      alert('Failed to load Instagram pages. Please try again or contact support if the issue persists.');
+      alert(
+        `Failed to load Instagram pages. Error: ${e.message}. Please try again or contact support if the issue persists.`
+      );
     }
   }, []);
 
@@ -56,7 +58,9 @@ export const InstagramContinue: FC<{
       closeModal();
     } catch (error) {
       console.error('Error saving Instagram integration:', error);
-      alert('Failed to save Instagram integration. Please try again or contact support if the issue persists.');
+      alert(
+        `Failed to save Instagram integration. Error: ${error.message}. Please try again or contact support if the issue persists.`
+      );
     }
   }, [integration, page]);
 
