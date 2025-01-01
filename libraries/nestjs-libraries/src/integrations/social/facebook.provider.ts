@@ -8,6 +8,7 @@ import {
 import { makeId } from '@gitroom/nestjs-libraries/services/make.is';
 import dayjs from 'dayjs';
 import { SocialAbstract } from '@gitroom/nestjs-libraries/integrations/social.abstract';
+import { Logger } from '@nestjs/common';
 
 export class FacebookProvider extends SocialAbstract implements SocialProvider {
   identifier = 'facebook';
@@ -54,20 +55,25 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
     requiredId: string,
     accessToken: string
   ): Promise<AuthTokenDetails> {
-    const information = await this.fetchPageInformation(
-      accessToken,
-      requiredId
-    );
+    try {
+      const information = await this.fetchPageInformation(
+        accessToken,
+        requiredId
+      );
 
-    return {
-      id: information.id,
-      name: information.name,
-      accessToken: information.access_token,
-      refreshToken: information.access_token,
-      expiresIn: dayjs().add(59, 'days').unix() - dayjs().unix(),
-      picture: information.picture,
-      username: information.username,
-    };
+      return {
+        id: information.id,
+        name: information.name,
+        accessToken: information.access_token,
+        refreshToken: information.access_token,
+        expiresIn: dayjs().add(59, 'days').unix() - dayjs().unix(),
+        picture: information.picture,
+        username: information.username,
+      };
+    } catch (error) {
+      Logger.error('Error during Facebook reconnection:', error);
+      throw new Error('Failed to reconnect with Facebook. Please try again or contact support if the issue persists.');
+    }
   }
 
   async authenticate(params: {
@@ -75,62 +81,67 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
     codeVerifier: string;
     refresh?: string;
   }) {
-    const getAccessToken = await (
-      await this.fetch(
-        'https://graph.facebook.com/v20.0/oauth/access_token' +
-          `?client_id=${process.env.FACEBOOK_APP_ID}` +
-          `&redirect_uri=${encodeURIComponent(
-            `${process.env.FRONTEND_URL}/integrations/social/facebook${
-              params.refresh ? `?refresh=${params.refresh}` : ''
-            }`
-          )}` +
-          `&client_secret=${process.env.FACEBOOK_APP_SECRET}` +
-          `&code=${params.code}`
-      )
-    ).json();
+    try {
+      const getAccessToken = await (
+        await this.fetch(
+          'https://graph.facebook.com/v20.0/oauth/access_token' +
+            `?client_id=${process.env.FACEBOOK_APP_ID}` +
+            `&redirect_uri=${encodeURIComponent(
+              `${process.env.FRONTEND_URL}/integrations/social/facebook${
+                params.refresh ? `?refresh=${params.refresh}` : ''
+              }`
+            )}` +
+            `&client_secret=${process.env.FACEBOOK_APP_SECRET}` +
+            `&code=${params.code}`
+        )
+      ).json();
 
-    const { access_token } = await (
-      await this.fetch(
-        'https://graph.facebook.com/v20.0/oauth/access_token' +
-          '?grant_type=fb_exchange_token' +
-          `&client_id=${process.env.FACEBOOK_APP_ID}` +
-          `&client_secret=${process.env.FACEBOOK_APP_SECRET}` +
-          `&fb_exchange_token=${getAccessToken.access_token}&fields=access_token,expires_in`
-      )
-    ).json();
+      const { access_token } = await (
+        await this.fetch(
+          'https://graph.facebook.com/v20.0/oauth/access_token' +
+            '?grant_type=fb_exchange_token' +
+            `&client_id=${process.env.FACEBOOK_APP_ID}` +
+            `&client_secret=${process.env.FACEBOOK_APP_SECRET}` +
+            `&fb_exchange_token=${getAccessToken.access_token}&fields=access_token,expires_in`
+        )
+      ).json();
 
-    const { data } = await (
-      await this.fetch(
-        `https://graph.facebook.com/v20.0/me/permissions?access_token=${access_token}`
-      )
-    ).json();
+      const { data } = await (
+        await this.fetch(
+          `https://graph.facebook.com/v20.0/me/permissions?access_token=${access_token}`
+        )
+      ).json();
 
-    const permissions = data
-      .filter((d: any) => d.status === 'granted')
-      .map((p: any) => p.permission);
-    this.checkScopes(this.scopes, permissions);
+      const permissions = data
+        .filter((d: any) => d.status === 'granted')
+        .map((p: any) => p.permission);
+      this.checkScopes(this.scopes, permissions);
 
-    const {
-      id,
-      name,
-      picture: {
-        data: { url },
-      },
-    } = await (
-      await this.fetch(
-        `https://graph.facebook.com/v20.0/me?fields=id,name,picture&access_token=${access_token}`
-      )
-    ).json();
+      const {
+        id,
+        name,
+        picture: {
+          data: { url },
+        },
+      } = await (
+        await this.fetch(
+          `https://graph.facebook.com/v20.0/me?fields=id,name,picture&access_token=${access_token}`
+        )
+      ).json();
 
-    return {
-      id,
-      name,
-      accessToken: access_token,
-      refreshToken: access_token,
-      expiresIn: dayjs().add(59, 'days').unix() - dayjs().unix(),
-      picture: url,
-      username: '',
-    };
+      return {
+        id,
+        name,
+        accessToken: access_token,
+        refreshToken: access_token,
+        expiresIn: dayjs().add(59, 'days').unix() - dayjs().unix(),
+        picture: url,
+        username: '',
+      };
+    } catch (error) {
+      Logger.error('Error during Facebook authentication:', error);
+      throw new Error('Failed to authenticate with Facebook. Please try again or contact support if the issue persists.');
+    }
   }
 
   async pages(accessToken: string) {

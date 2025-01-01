@@ -22,6 +22,8 @@ export const FacebookContinue: FC<{
       return pages;
     } catch (e) {
       closeModal();
+      console.error('Error loading Facebook pages:', e);
+      alert('Failed to load Facebook pages. Please try again or contact support if the issue persists.');
     }
   }, []);
 
@@ -42,13 +44,17 @@ export const FacebookContinue: FC<{
     refreshInterval: 0,
   });
 
-  const saveInstagram = useCallback(async () => {
-    await fetch(`/integrations/facebook/${integration?.id}`, {
-      method: 'POST',
-      body: JSON.stringify({ page }),
-    });
-
-    closeModal();
+  const saveFacebook = useCallback(async () => {
+    try {
+      await fetch(`/integrations/facebook/${integration?.id}`, {
+        method: 'POST',
+        body: JSON.stringify({ page }),
+      });
+      closeModal();
+    } catch (error) {
+      console.error('Error saving Facebook integration:', error);
+      alert('Failed to save Facebook integration. Please try again or contact support if the issue persists.');
+    }
   }, [integration, page]);
 
   const filteredData = useMemo(() => {
@@ -102,7 +108,7 @@ export const FacebookContinue: FC<{
         )}
       </div>
       <div>
-        <Button disabled={!page} onClick={saveInstagram}>
+        <Button disabled={!page} onClick={saveFacebook}>
           Save
         </Button>
       </div>
