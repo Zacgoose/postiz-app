@@ -95,6 +95,9 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
           `&client_secret=${process.env.FACEBOOK_APP_SECRET}` +
           `&code=${params.code}`
       );
+      if (!getAccessTokenResponse.ok) {
+        throw new Error(`Failed to fetch access token: ${getAccessTokenResponse.statusText}`);
+      }
       const getAccessToken = await getAccessTokenResponse.json();
 
       const exchangeTokenResponse = await this.fetch(
@@ -104,11 +107,17 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
           `&client_secret=${process.env.FACEBOOK_APP_SECRET}` +
           `&fb_exchange_token=${getAccessToken.access_token}&fields=access_token,expires_in`
       );
+      if (!exchangeTokenResponse.ok) {
+        throw new Error(`Failed to exchange token: ${exchangeTokenResponse.statusText}`);
+      }
       const { access_token } = await exchangeTokenResponse.json();
 
       const permissionsResponse = await this.fetch(
         `https://graph.facebook.com/v20.0/me/permissions?access_token=${access_token}`
       );
+      if (!permissionsResponse.ok) {
+        throw new Error(`Failed to fetch permissions: ${permissionsResponse.statusText}`);
+      }
       const { data } = await permissionsResponse.json();
 
       const permissions = data
@@ -119,6 +128,9 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
       const userInfoResponse = await this.fetch(
         `https://graph.facebook.com/v20.0/me?fields=id,name,picture&access_token=${access_token}`
       );
+      if (!userInfoResponse.ok) {
+        throw new Error(`Failed to fetch user info: ${userInfoResponse.statusText}`);
+      }
       const {
         id,
         name,
