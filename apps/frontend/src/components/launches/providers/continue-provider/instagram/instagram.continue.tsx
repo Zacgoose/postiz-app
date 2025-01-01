@@ -23,11 +23,11 @@ export const InstagramContinue: FC<{
     try {
       const pages = await call.get('pages');
       return pages;
-    } catch (e) {
+    } catch (error) {
       closeModal();
-      console.error('Error loading Instagram pages:', e);
+      console.error('Error loading Instagram pages:', error);
       alert(
-        `Failed to load Instagram pages. Error: ${e.message}. Please try again or contact support if the issue persists.`
+        `Failed to load Instagram pages. Error: ${error.message}. Please try again or contact support if the issue persists.`
       );
     }
   }, []);

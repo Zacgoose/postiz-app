@@ -20,11 +20,11 @@ export const FacebookContinue: FC<{
     try {
       const pages = await call.get('pages');
       return pages;
-    } catch (e) {
+    } catch (error) {
       closeModal();
-      console.error('Error loading Facebook pages:', e);
+      console.error('Error loading Facebook pages:', error);
       alert(
-        `Failed to load Facebook pages. Error: ${e.message}. Please try again or contact support if the issue persists.`
+        `Failed to load Facebook pages. Error: ${error.message}. Please try again or contact support if the issue persists.`
       );
     }
   }, []);
