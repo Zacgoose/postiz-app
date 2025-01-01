@@ -58,14 +58,14 @@ jobs:
         env: 
           CONTAINERVER: ${{ needs.build-containers-common.outputs.containerver }}
         run: |
-          docker tag localhost/postiz ghcr.io/Zacgoose/postiz-app:${{ matrix.arch }}-${{ env.CONTAINERVER }}
-          docker push ghcr.io/Zacgoose/postiz-app:${{ matrix.arch }}-${{ env.CONTAINERVER }}
+          docker tag localhost/postiz ghcr.io/zacgoose/postiz-app:${{ matrix.arch }}-${{ env.CONTAINERVER }}
+          docker push ghcr.io/zacgoose/postiz-app:${{ matrix.arch }}-${{ env.CONTAINERVER }}
 
-          docker tag localhost/postiz-devcontainer ghcr.io/Zacgoose/postiz-devcontainer:${{ env.CONTAINERVER }}
-          docker push ghcr.io/Zacgoose/postiz-devcontainer:${{ env.CONTAINERVER }}
+          docker tag localhost/postiz-devcontainer ghcr.io/zacgoose/postiz-devcontainer:${{ env.CONTAINERVER }}
+          docker push ghcr.io/zacgoose/postiz-devcontainer:${{ env.CONTAINERVER }}
 
-          docker tag ghcr.io/Zacgoose/postiz-devcontainer:${{ env.CONTAINERVER }} ghcr.io/Zacgoose/postiz-devcontainer:latest
-          docker push ghcr.io/Zacgoose/postiz-devcontainer:latest
+          docker tag ghcr.io/zacgoose/postiz-devcontainer:${{ env.CONTAINERVER }} ghcr.io/zacgoose/postiz-devcontainer:latest
+          docker push ghcr.io/zacgoose/postiz-devcontainer:latest
 
   build-container-manifest:
     needs: [build-containers, build-containers-common]
@@ -83,8 +83,8 @@ jobs:
           CONTAINERVER: ${{ needs.build-containers-common.outputs.containerver }}
         run: |
           docker manifest create \
-            ghcr.io/Zacgoose/postiz-app:latest \
-            ghcr.io/Zacgoose/postiz-app:amd64-${{ env.CONTAINERVER }} \
-            ghcr.io/Zacgoose/postiz-app:arm64-${{ env.CONTAINERVER }}
+            ghcr.io/zacgoose/postiz-app:latest \
+            ghcr.io/zacgoose/postiz-app:amd64-${{ env.CONTAINERVER }} \
+            ghcr.io/zacgoose/postiz-app:arm64-${{ env.CONTAINERVER }}
 
-          docker manifest push ghcr.io/Zacgoose/postiz-app:latest
+          docker manifest push ghcr.io/zacgoose/postiz-app:latest
