@@ -23,14 +23,8 @@ export const InstagramContinue: FC<{
     try {
       const pages = await call.get('pages');
       return pages;
-    } catch (error) {
+    } catch (e) {
       closeModal();
-      console.error('Error loading Instagram pages:', error);
-      const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error';
-      alert(
-        `Failed to load Instagram pages. Error: ${errorMessage}. Please try again or contact support if the issue persists.`
-      );
     }
   }, []);
 
@@ -52,20 +46,12 @@ export const InstagramContinue: FC<{
   });
 
   const saveInstagram = useCallback(async () => {
-    try {
-      await fetch(`/integrations/instagram/${integration?.id}`, {
-        method: 'POST',
-        body: JSON.stringify(page),
-      });
-      closeModal();
-    } catch (error) {
-      console.error('Error saving Instagram integration:', error);
-      const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error';
-      alert(
-        `Failed to save Instagram integration. Error: ${errorMessage}. Please try again or contact support if the issue persists.`
-      );
-    }
+    await fetch(`/integrations/instagram/${integration?.id}`, {
+      method: 'POST',
+      body: JSON.stringify(page),
+    });
+
+    closeModal();
   }, [integration, page]);
 
   const filteredData = useMemo(() => {
