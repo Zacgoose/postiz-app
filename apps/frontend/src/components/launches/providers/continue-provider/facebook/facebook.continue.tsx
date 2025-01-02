@@ -43,12 +43,14 @@ export const FacebookContinue: FC<{
   });
 
   const saveInstagram = useCallback(async () => {
-    await fetch(`/integrations/facebook/${integration?.id}`, {
-      method: 'POST',
-      body: JSON.stringify({ page }),
-    });
-
-    closeModal();
+    try {
+      await fetch(`/integrations/facebook/${integration?.id}`, {
+        method: 'POST',
+        body: JSON.stringify({ page }),
+      });
+    } catch (e) {
+      closeModal();
+    }
   }, [integration, page]);
 
   const filteredData = useMemo(() => {
