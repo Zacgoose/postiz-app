@@ -37,29 +37,6 @@ LABEL org.opencontainers.image.source=https://github.com/gitroomhq/postiz-app
 
 ENTRYPOINT ["/app/entrypoint.sh"]
 
-# Builder image
-FROM base AS devcontainer
-
-RUN apk add --no-cache \
-	pkgconfig \
-	gcc \
-	pixman-dev \
-	cairo-dev \
-	pango-dev \
-	make \
-	build-base
-
-COPY nx.json tsconfig.base.json package.json package-lock.json build.plugins.js /app/
-COPY apps /app/apps/
-COPY libraries /app/libraries/
-
-RUN npm ci --no-fund && npx nx run-many --target=build --projects=frontend,backend,workers,cron
-
-VOLUME /config
-VOLUME /uploads
-
-LABEL org.opencontainers.image.title="Postiz App (DevContainer)"
-
 # Output image
 FROM base AS dist
 
