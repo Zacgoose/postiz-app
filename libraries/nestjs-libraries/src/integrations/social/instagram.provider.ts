@@ -10,6 +10,7 @@ import { timer } from '@gitroom/helpers/utils/timer';
 import dayjs from 'dayjs';
 import { SocialAbstract } from '@gitroom/nestjs-libraries/integrations/social.abstract';
 import { InstagramDto } from '@gitroom/nestjs-libraries/dtos/posts/providers-settings/instagram.dto';
+import { Logger } from '@nestjs/common';
 
 export class InstagramProvider
   extends SocialAbstract
@@ -45,24 +46,35 @@ export class InstagramProvider
     requiredId: string,
     accessToken: string
   ): Promise<AuthTokenDetails> {
-    const findPage = (await this.pages(accessToken)).find(
-      (p) => p.id === requiredId
-    );
+    try {
+      const findPage = (await this.pages(accessToken)).find(
+        (p) => p.id === requiredId
+      );
 
-    const information = await this.fetchPageInformation(accessToken, {
-      id: requiredId,
-      pageId: findPage?.pageId!,
-    });
+      if (!findPage) {
+        throw new Error('Page not found');
+      }
 
-    return {
-      id: information.id,
-      name: information.name,
-      accessToken: information.access_token,
-      refreshToken: information.access_token,
-      expiresIn: dayjs().add(59, 'days').unix() - dayjs().unix(),
-      picture: information.picture,
-      username: information.username,
-    };
+      const information = await this.fetchPageInformation(accessToken, {
+        id: requiredId,
+        pageId: findPage.pageId!,
+      });
+
+      return {
+        id: information.id,
+        name: information.name,
+        accessToken: information.access_token,
+        refreshToken: information.access_token,
+        expiresIn: dayjs().add(59, 'days').unix() - dayjs().unix(),
+        picture: information.picture,
+        username: information.username,
+      };
+    } catch (error) {
+      Logger.error('Error during Instagram reconnection:', error);
+      throw new Error(
+        `Failed to reconnect with Instagram. Error: ${error.message}. Please try again or contact support if the issue persists.`
+      );
+    }
   }
 
   async generateAuthUrl() {

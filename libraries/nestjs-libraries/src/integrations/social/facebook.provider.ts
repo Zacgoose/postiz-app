@@ -8,6 +8,7 @@ import {
 import { makeId } from '@gitroom/nestjs-libraries/services/make.is';
 import dayjs from 'dayjs';
 import { SocialAbstract } from '@gitroom/nestjs-libraries/integrations/social.abstract';
+import { Logger } from '@nestjs/common';
 
 export class FacebookProvider extends SocialAbstract implements SocialProvider {
   identifier = 'facebook';
@@ -21,6 +22,7 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
     'pages_read_engagement',
     'read_insights',
   ];
+
   async refreshToken(refresh_token: string): Promise<AuthTokenDetails> {
     return {
       refreshToken: '',
@@ -54,20 +56,27 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
     requiredId: string,
     accessToken: string
   ): Promise<AuthTokenDetails> {
-    const information = await this.fetchPageInformation(
-      accessToken,
-      requiredId
-    );
+    try {
+      const information = await this.fetchPageInformation(
+        accessToken,
+        requiredId
+      );
 
-    return {
-      id: information.id,
-      name: information.name,
-      accessToken: information.access_token,
-      refreshToken: information.access_token,
-      expiresIn: dayjs().add(59, 'days').unix() - dayjs().unix(),
-      picture: information.picture,
-      username: information.username,
-    };
+      return {
+        id: information.id,
+        name: information.name,
+        accessToken: information.access_token,
+        refreshToken: information.access_token,
+        expiresIn: dayjs().add(59, 'days').unix() - dayjs().unix(),
+        picture: information.picture,
+        username: information.username,
+      };
+    } catch (error) {
+      Logger.error('Error during Facebook reconnection:', error);
+      throw new Error(
+        `Failed to reconnect with Facebook. Error: ${error.message}. Please try again or contact support if the issue persists.`
+      );
+    }
   }
 
   async authenticate(params: {
