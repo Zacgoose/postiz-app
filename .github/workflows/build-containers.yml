@@ -43,10 +43,6 @@ jobs:
       - name: docker build
         run: ./var/docker/docker-build.sh
 
-      - name: Print post-build debug info
-        run: |
-          docker images
-
       - name: docker tag
         env: 
           CONTAINERVER: ${{ needs.build-containers-common.outputs.containerver }}

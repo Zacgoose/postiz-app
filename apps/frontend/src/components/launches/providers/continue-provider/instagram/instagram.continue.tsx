@@ -23,7 +23,7 @@ export const InstagramContinue: FC<{
     try {
       const pages = await call.get('pages');
       return pages;
-    } catch (error) {
+    } catch (e) {
       closeModal();
       console.error('Error loading Instagram pages:', {
         error,

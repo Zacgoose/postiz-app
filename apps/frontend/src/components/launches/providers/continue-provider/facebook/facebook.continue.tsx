@@ -20,7 +20,7 @@ export const FacebookContinue: FC<{
     try {
       const pages = await call.get('pages');
       return pages;
-    } catch (error) {
+    } catch (e) {
       closeModal();
       console.error('Error loading Instagram pages:', {
         error,
@@ -63,6 +63,7 @@ export const FacebookContinue: FC<{
         method: 'POST',
         body: JSON.stringify(page),
       });
+    } catch (e) {
       closeModal();
     } catch (error) {
       console.error('Error saving Facebook integration:', {
@@ -128,7 +129,7 @@ export const FacebookContinue: FC<{
         )}
       </div>
       <div>
-        <Button disabled={!page} onClick={saveFacebook}>
+        <Button disabled={!page} onClick={saveInstagram}>
           Save
         </Button>
       </div>
