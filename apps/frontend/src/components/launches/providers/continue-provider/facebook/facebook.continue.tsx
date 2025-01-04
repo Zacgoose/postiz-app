@@ -22,14 +22,19 @@ export const FacebookContinue: FC<{
       return pages;
     } catch (error) {
       closeModal();
-      console.error('Error loading Facebook pages:', error);
+      console.error('Error loading Instagram pages:', {
+        error,
+        context: 'Fetching pages for Instagram',
+      });
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error';
       alert(
-        `Failed to load Facebook pages. Error: ${errorMessage}. Please try again or contact support if the issue persists.`
+        `Failed to load Instagram pages. Error: ${errorMessage}. This could be due to a network issue or invalid credentials. Please try again later or contact support.`
       );
+      return null; // Explicitly return null for failed attempts.
     }
   }, []);
+  
 
   const setPage = useCallback(
     (id: string) => () => {
@@ -49,18 +54,25 @@ export const FacebookContinue: FC<{
   });
 
   const saveFacebook = useCallback(async () => {
+    if (!page) {
+      alert('Please select a page before saving.');
+      return;
+    }
     try {
       await fetch(`/integrations/facebook/${integration?.id}`, {
         method: 'POST',
-        body: JSON.stringify({ page }),
+        body: JSON.stringify(page),
       });
       closeModal();
     } catch (error) {
-      console.error('Error saving Facebook integration:', error);
+      console.error('Error saving Facebook integration:', {
+        error,
+        context: 'Saving selected Facebook page',
+      });
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error';
       alert(
-        `Failed to save Facebook integration. Error: ${errorMessage}. Please try again or contact support if the issue persists.`
+        `Failed to save Facebook integration. Error: ${errorMessage}. Please check your connection or try again later.`
       );
     }
   }, [integration, page]);
