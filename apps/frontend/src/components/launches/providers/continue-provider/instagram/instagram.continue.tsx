@@ -95,11 +95,12 @@ export const FacebookContinue: FC<{
 
   return (
     <div className="flex flex-col gap-[20px]">
-      <div>Select Page:</div>
+      <div>Select Instagram Account:</div>
       <div className="grid grid-cols-3 justify-items-center select-none cursor-pointer">
         {filteredData?.map(
           (p: {
             id: string;
+            pageId: string;
             username: string;
             name: string;
             picture: { data: { url: string } };
@@ -108,9 +109,9 @@ export const FacebookContinue: FC<{
               key={p.id}
               className={clsx(
                 'flex flex-col w-full text-center gap-[10px] border border-input p-[10px] hover:bg-seventh',
-                page === p.id && 'bg-seventh'
+                page?.id === p.id && 'bg-seventh'
               )}
-              onClick={setPage(p.id)}
+              onClick={setPage(p)}
             >
               <div>
                 <img

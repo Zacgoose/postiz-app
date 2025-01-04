@@ -52,7 +52,7 @@ export const FacebookContinue: FC<{
     refreshInterval: 0,
   });
 
-  const saveFacebook = useCallback(async () => {
+  const saveInstagram = useCallback(async () => {
     if (!page) {
       alert('Please select a page before saving.');
       return;
@@ -127,7 +127,7 @@ export const FacebookContinue: FC<{
         )}
       </div>
       <div>
-        <Button disabled={!page} onClick={saveFacebook}>
+        <Button disabled={!page} onClick={saveInstagram}>
           Save
         </Button>
       </div>
