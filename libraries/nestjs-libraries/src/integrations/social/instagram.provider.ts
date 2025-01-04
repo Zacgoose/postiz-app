@@ -71,9 +71,15 @@ export class InstagramProvider
       };
     } catch (error) {
       Logger.error('Error during Instagram reconnection:', error);
-      throw new Error(
-        `Failed to reconnect with Instagram. Error: ${error.message}. Please try again or contact support if the issue persists.`
-      );
+      return {
+        id: '',
+        name: '',
+        accessToken: '',
+        refreshToken: '',
+        expiresIn: 0,
+        picture: '',
+        username: '',
+      };
     }
   }
 

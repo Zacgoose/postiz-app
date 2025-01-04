@@ -57,11 +57,8 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
     accessToken: string
   ): Promise<AuthTokenDetails> {
     try {
-      const information = await this.fetchPageInformation(
-        accessToken,
-        requiredId
-      );
-
+      const information = await this.fetchPageInformation(accessToken, requiredId);
+  
       return {
         id: information.id,
         name: information.name,
@@ -73,9 +70,15 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
       };
     } catch (error) {
       Logger.error('Error during Facebook reconnection:', error);
-      throw new Error(
-        `Failed to reconnect with Facebook. Error: ${error.message}. Please try again or contact support if the issue persists.`
-      );
+      return {
+        id: '',
+        name: '',
+        accessToken: '',
+        refreshToken: '',
+        expiresIn: 0,
+        picture: '',
+        username: '',
+      };
     }
   }
 
