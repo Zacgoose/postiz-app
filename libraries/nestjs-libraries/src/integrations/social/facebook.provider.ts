@@ -70,6 +70,12 @@ export class FacebookProvider extends SocialAbstract implements SocialProvider {
       };
     } catch (error) {
       Logger.error('Error during Facebook reconnection:', error);
+      if (error instanceof Error) {
+        Logger.error(`Error message: ${error.message}`);
+      }
+      if (error.cause) {
+        Logger.error(`Error cause: ${error.cause}`);
+      }
       return {
         id: '',
         name: '',
