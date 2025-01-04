@@ -63,7 +63,6 @@ export const FacebookContinue: FC<{
         method: 'POST',
         body: JSON.stringify(page),
       });
-    } catch (e) {
       closeModal();
     } catch (error) {
       console.error('Error saving Facebook integration:', {
