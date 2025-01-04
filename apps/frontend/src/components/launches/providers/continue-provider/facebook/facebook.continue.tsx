@@ -22,16 +22,6 @@ export const FacebookContinue: FC<{
       return pages;
     } catch (e) {
       closeModal();
-      console.error('Error loading Facebook pages:', {
-        error: e,
-        context: 'Fetching pages for Facebook',
-      });
-      const errorMessage =
-        e instanceof Error ? e.message : 'Unknown error';
-      alert(
-        `Failed to load Facebook pages. Error: ${errorMessage}. This could be due to a network issue or invalid credentials. Please try again later or contact support.`
-      );
-      return null; // Explicitly return null for failed attempts.
     }
   }, []);
 
@@ -53,27 +43,12 @@ export const FacebookContinue: FC<{
   });
 
   const saveInstagram = useCallback(async () => {
-    if (!page) {
-      alert('Please select a page before saving.');
-      return;
-    }
-    try {
-      await fetch(`/integrations/facebook/${integration?.id}`, {
-        method: 'POST',
-        body: JSON.stringify(page),
-      });
-      closeModal();
-    } catch (e) {
-      console.error('Error saving Facebook integration:', {
-        error: e,
-        context: 'Saving selected Facebook page',
-      });
-      const errorMessage =
-        e instanceof Error ? e.message : 'Unknown error';
-      alert(
-        `Failed to save Facebook integration. Error: ${errorMessage}. Please check your connection or try again later.`
-      );
-    }
+    await fetch(`/integrations/facebook/${integration?.id}`, {
+      method: 'POST',
+      body: JSON.stringify({ page }),
+    });
+
+    closeModal();
   }, [integration, page]);
 
   const filteredData = useMemo(() => {
