@@ -6,17 +6,14 @@ import { Button } from '@gitroom/react/form/button';
 import { useFetch } from '@gitroom/helpers/utils/custom.fetch';
 import { useIntegration } from '@gitroom/frontend/components/launches/helpers/use.integration';
 
-export const InstagramContinue: FC<{
+export const FacebookContinue: FC<{
   closeModal: () => void;
   existingId: string[];
 }> = (props) => {
   const { closeModal, existingId } = props;
   const call = useCustomProviderFunction();
   const { integration } = useIntegration();
-  const [page, setSelectedPage] = useState<null | {
-    id: string;
-    pageId: string;
-  }>(null);
+  const [page, setSelectedPage] = useState<null | string>(null);
   const fetch = useFetch();
 
   const loadPages = useCallback(async () => {
@@ -26,21 +23,20 @@ export const InstagramContinue: FC<{
     } catch (e) {
       closeModal();
       console.error('Error loading Instagram pages:', {
-        error,
+        error: e,
         context: 'Fetching pages for Instagram',
       });
-      const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage = e instanceof Error ? e.message : 'Unknown error';
       alert(
         `Failed to load Instagram pages. Error: ${errorMessage}. This could be due to a network issue or invalid credentials. Please try again later or contact support.`
       );
       return null; // Explicitly return null for failed attempts.
     }
-  }, []);  
+  }, []);
 
   const setPage = useCallback(
-    (param: { id: string; pageId: string }) => () => {
-      setSelectedPage(param);
+    (id: string) => () => {
+      setSelectedPage(id);
     },
     []
   );
@@ -55,29 +51,28 @@ export const InstagramContinue: FC<{
     refreshInterval: 0,
   });
 
-  const saveInstagram = useCallback(async () => {
+  const saveFacebook = useCallback(async () => {
     if (!page) {
       alert('Please select a page before saving.');
       return;
     }
     try {
-      await fetch(`/integrations/instagram/${integration?.id}`, {
+      await fetch(`/integrations/facebook/${integration?.id}`, {
         method: 'POST',
         body: JSON.stringify(page),
       });
       closeModal();
-    } catch (error) {
-      console.error('Error saving Instagram integration:', {
-        error,
-        context: 'Saving selected Instagram page',
+    } catch (e) {
+      console.error('Error saving Facebook integration:', {
+        error: e,
+        context: 'Saving selected Facebook page',
       });
-      const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage = e instanceof Error ? e.message : 'Unknown error';
       alert(
-        `Failed to save Instagram integration. Error: ${errorMessage}. Please check your connection or try again later.`
+        `Failed to save Facebook integration. Error: ${errorMessage}. Please check your connection or try again later.`
       );
     }
-  }, [integration, page]);  
+  }, [integration, page]);
 
   const filteredData = useMemo(() => {
     return (
@@ -100,12 +95,11 @@ export const InstagramContinue: FC<{
 
   return (
     <div className="flex flex-col gap-[20px]">
-      <div>Select Instagram Account:</div>
+      <div>Select Page:</div>
       <div className="grid grid-cols-3 justify-items-center select-none cursor-pointer">
         {filteredData?.map(
           (p: {
             id: string;
-            pageId: string;
             username: string;
             name: string;
             picture: { data: { url: string } };
@@ -114,9 +108,9 @@ export const InstagramContinue: FC<{
               key={p.id}
               className={clsx(
                 'flex flex-col w-full text-center gap-[10px] border border-input p-[10px] hover:bg-seventh',
-                page?.id === p.id && 'bg-seventh'
+                page === p.id && 'bg-seventh'
               )}
-              onClick={setPage(p)}
+              onClick={setPage(p.id)}
             >
               <div>
                 <img

@@ -22,19 +22,18 @@ export const FacebookContinue: FC<{
       return pages;
     } catch (e) {
       closeModal();
-      console.error('Error loading Instagram pages:', {
-        error,
-        context: 'Fetching pages for Instagram',
+      console.error('Error loading Facebook pages:', {
+        error: e,
+        context: 'Fetching pages for Facebook',
       });
       const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error';
+        e instanceof Error ? e.message : 'Unknown error';
       alert(
-        `Failed to load Instagram pages. Error: ${errorMessage}. This could be due to a network issue or invalid credentials. Please try again later or contact support.`
+        `Failed to load Facebook pages. Error: ${errorMessage}. This could be due to a network issue or invalid credentials. Please try again later or contact support.`
       );
       return null; // Explicitly return null for failed attempts.
     }
   }, []);
-  
 
   const setPage = useCallback(
     (id: string) => () => {
@@ -64,13 +63,13 @@ export const FacebookContinue: FC<{
         body: JSON.stringify(page),
       });
       closeModal();
-    } catch (error) {
+    } catch (e) {
       console.error('Error saving Facebook integration:', {
-        error,
+        error: e,
         context: 'Saving selected Facebook page',
       });
       const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error';
+        e instanceof Error ? e.message : 'Unknown error';
       alert(
         `Failed to save Facebook integration. Error: ${errorMessage}. Please check your connection or try again later.`
       );
@@ -128,7 +127,7 @@ export const FacebookContinue: FC<{
         )}
       </div>
       <div>
-        <Button disabled={!page} onClick={saveInstagram}>
+        <Button disabled={!page} onClick={saveFacebook}>
           Save
         </Button>
       </div>
